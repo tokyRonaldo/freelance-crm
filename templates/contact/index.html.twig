@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contacts{% endblock %}
+
+{% block body %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Contacts</h1>
+        <a href="{{ path('app_contact_new') }}" class="btn btn-primary">Nouveau contact</a>
+    </div>
+
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-md-6">
+            <input type="text" name="q" value="{{ search }}" class="form-control"
+                   placeholder="Nom, entreprise ou e-mail">
+        </div>
+        <div class="col-md-3">
+            <select name="type" class="form-select">
+                <option value="">Tous les types</option>
+                <option value="prospect" {{ type == 'prospect' ? 'selected' : '' }}>Prospect</option>
+                <option value="client" {{ type == 'client' ? 'selected' : '' }}>Client</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-outline-secondary">Filtrer</button>
+            <a href="{{ path('app_contact_index') }}" class="btn btn-link">Réinitialiser</a>
+        </div>
+    </form>
+
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Entreprise</th>
+                <th>E-mail</th>
+                <th>Type</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for contact in pagination %}
+            <tr>
+                <td>{{ contact.firstName }} {{ contact.lastName }}</td>
+                <td>{{ contact.company }}</td>
+                <td>{{ contact.email }}</td>
+                <td>
+                    <span class="badge {{ contact.type == 'client' ? 'bg-success' : 'bg-info' }}">
+                        {{ contact.type|capitalize }}
+                    </span>
+                </td>
+                <td class="text-end">
+                    <a href="{{ path('app_contact_show', {id: contact.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                    <a href="{{ path('app_contact_edit', {id: contact.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5" class="text-center text-muted">Aucun contact trouvé.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {{ knp_pagination_render(pagination) }}
+</div>
+{% endblock %}
