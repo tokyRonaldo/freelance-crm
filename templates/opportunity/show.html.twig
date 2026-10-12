@@ -1,0 +1,46 @@
+{% extends 'layout_app.html.twig' %}
+
+{% block title %}Opportunity{% endblock %}
+
+{% block content %}
+    <h1>Opportunity</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ opportunity.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ opportunity.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ opportunity.description }}</td>
+            </tr>
+            <tr>
+                <th>Amount</th>
+                <td>{{ opportunity.amount }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ opportunity.status }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ opportunity.createdAt ? opportunity.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>ClosedAt</th>
+                <td>{{ opportunity.closedAt ? opportunity.closedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_opportunity_index') }}">back to list</a>
+
+    <a href="{{ path('app_opportunity_edit', {'id': opportunity.id}) }}">edit</a>
+
+    {{ include('opportunity/_delete_form.html.twig') }}
+{% endblock %}

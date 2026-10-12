@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Knp\Component\Pager\PaginatorInterface;
+use App\Entity\Activity;
+use App\Form\ActivityType;
+use App\Repository\ActivityRepository;
 
 #[Route('/contact')]
 final class ContactController extends AbstractController
@@ -62,14 +65,40 @@ final class ContactController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_contact_show', methods: ['GET'])]
-    public function show(Contact $contact): Response
+    public function show(Contact $contact, ActivityRepository $activityRepository): Response
     {
         if ($contact->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
+
+        $activity = (new Activity())->setOccurredAt(new \DateTimeImmutable());
+
+        $form = $this->createForm(ActivityType::class, $activity, [
+            'contact' => $contact,
+            'action' => $this->generateUrl('app_activity_new', ['id' => $contact->getId()]),
+        ]);
+
         return $this->render('contact/show.html.twig', [
             'contact' => $contact,
+            'activities' => $activityRepository->findBy(['contact' => $contact], ['occurredAt' => 'DESC']),
+            'activityForm' => $form,
         ]);
+    }
+
+    #[Route('/{id}/convert', name: 'app_contact_convert', methods: ['POST'])]
+    public function convert(Request $request, Contact $contact, EntityManagerInterface $em): Response
+    {
+        if ($contact->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($this->isCsrfTokenValid('convert' . $contact->getId(), $request->getPayload()->getString('_token'))) {
+            $contact->setType('client');
+            $em->flush();
+            $this->addFlash('success', 'Ce contact est maintenant un client.');
+        }
+
+        return $this->redirectToRoute('app_contact_show', ['id' => $contact->getId()]);
     }
 
     #[Route('/{id}/edit', name: 'app_contact_edit', methods: ['GET', 'POST'])]
@@ -99,6 +128,13 @@ final class ContactController extends AbstractController
         if ($contact->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
+
+        if (!$contact->getOpportunities()->isEmpty()) {
+            $this->addFlash('error', 'Ce contact a encore des opportunités : traite-les avant de le supprimer.');
+
+            return $this->redirectToRoute('app_contact_show', ['id' => $contact->getId()]);
+        }
+        
         if ($this->isCsrfTokenValid('delete'.$contact->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($contact);
             $entityManager->flush();

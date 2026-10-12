@@ -1,0 +1,44 @@
+{% extends 'form_div_layout.html.twig' %}
+
+{% block form_widget_simple %}
+    {% set attr = attr|merge({
+        class: (attr.class|default('') ~ ' w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none')|trim
+    }) %}
+    {{ parent() }}
+{% endblock %}
+
+{% block textarea_widget %}
+    {% set attr = attr|merge({
+        class: (attr.class|default('') ~ ' w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none')|trim
+    }) %}
+    {{ parent() }}
+{% endblock %}
+
+{% block choice_widget_collapsed %}
+    {% set attr = attr|merge({
+        class: (attr.class|default('') ~ ' w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none')|trim
+    }) %}
+    {{ parent() }}
+{% endblock %}
+
+{% block form_row %}
+    <div class="mb-4">
+        {{ form_label(form, null, {
+            label_attr: {
+                class: 'block text-sm font-medium text-on-surface mb-1'
+            }
+        }) }}
+
+        {{ form_widget(form) }}
+
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+
+{% block form_errors %}
+    {% for error in errors %}
+        <p class="mt-1 text-sm text-error">
+            {{ error.message }}
+        </p>
+    {% endfor %}
+{% endblock %}

@@ -1,64 +1,74 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout_app.html.twig' %}
 
 {% block title %}Contacts{% endblock %}
 
-{% block body %}
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Contacts</h1>
-        <a href="{{ path('app_contact_new') }}" class="btn btn-primary">Nouveau contact</a>
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface">Contacts</h1>
+        <p class="text-on-surface-variant">Vos prospects et vos clients au même endroit.</p>
     </div>
+    <a href="{{ path('app_contact_new') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm transition-colors">
+        <span class="material-symbols-outlined text-[18px]">add</span> Nouveau contact
+    </a>
+</div>
 
-    <form method="get" class="row g-2 mb-3">
-        <div class="col-md-6">
-            <input type="text" name="q" value="{{ search }}" class="form-control"
-                   placeholder="Nom, entreprise ou e-mail">
-        </div>
-        <div class="col-md-3">
-            <select name="type" class="form-select">
-                <option value="">Tous les types</option>
-                <option value="prospect" {{ type == 'prospect' ? 'selected' : '' }}>Prospect</option>
-                <option value="client" {{ type == 'client' ? 'selected' : '' }}>Client</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-outline-secondary">Filtrer</button>
-            <a href="{{ path('app_contact_index') }}" class="btn btn-link">Réinitialiser</a>
-        </div>
-    </form>
+<form method="get" class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
+    <input type="text" name="q" value="{{ search }}" placeholder="Rechercher par nom, entreprise ou e-mail"
+           class="md:col-span-6 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+    <select name="type" class="md:col-span-3 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+        <option value="">Tous les types</option>
+        <option value="prospect" {{ type == 'prospect' ? 'selected' : '' }}>Prospect</option>
+        <option value="client" {{ type == 'client' ? 'selected' : '' }}>Client</option>
+    </select>
+    <div class="md:col-span-3 flex items-center gap-2">
+        <button class="px-4 py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-lg text-label-lg transition-colors">Filtrer</button>
+        <a href="{{ path('app_contact_index') }}" class="text-sm text-primary hover:underline">Réinitialiser</a>
+    </div>
+</form>
 
-    <table class="table table-hover align-middle">
-        <thead>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+    <table class="w-full text-left">
+        <thead class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wide">
             <tr>
-                <th>Nom</th>
-                <th>Entreprise</th>
-                <th>E-mail</th>
-                <th>Type</th>
-                <th class="text-end">Actions</th>
+                <th class="px-4 py-3">Nom</th>
+                <th class="px-4 py-3">Entreprise</th>
+                <th class="px-4 py-3">E-mail</th>
+                <th class="px-4 py-3">Type</th>
+                <th class="px-4 py-3 text-right">Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-surface-container">
         {% for contact in pagination %}
-            <tr>
-                <td>{{ contact.firstName }} {{ contact.lastName }}</td>
-                <td>{{ contact.company }}</td>
-                <td>{{ contact.email }}</td>
-                <td>
-                    <span class="badge {{ contact.type == 'client' ? 'bg-success' : 'bg-info' }}">
+            <tr class="hover:bg-surface-container-low transition-colors">
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-label-md font-semibold">
+                            {{ (contact.firstName|default('')|first ~ contact.lastName|first)|upper }}
+                        </div>
+                        <a href="{{ path('app_contact_show', {id: contact.id}) }}" class="font-medium text-on-surface hover:text-primary">
+                            {{ contact.firstName }} {{ contact.lastName }}
+                        </a>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-on-surface-variant">{{ contact.company }}</td>
+                <td class="px-4 py-3 text-on-surface-variant">{{ contact.email }}</td>
+                <td class="px-4 py-3">
+                    <span class="px-2.5 py-1 rounded-full font-label-sm text-label-sm {{ contact.type == 'client' ? 'bg-primary-fixed text-on-primary-fixed' : 'bg-secondary-container text-on-secondary-container' }}">
                         {{ contact.type|capitalize }}
                     </span>
                 </td>
-                <td class="text-end">
-                    <a href="{{ path('app_contact_show', {id: contact.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
-                    <a href="{{ path('app_contact_edit', {id: contact.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                <td class="px-4 py-3 text-right whitespace-nowrap">
+                    <a href="{{ path('app_contact_show', {id: contact.id}) }}" class="text-primary hover:underline text-sm mr-3">Voir</a>
+                    <a href="{{ path('app_contact_edit', {id: contact.id}) }}" class="text-on-surface-variant hover:text-primary text-sm">Modifier</a>
                 </td>
             </tr>
         {% else %}
-            <tr><td colspan="5" class="text-center text-muted">Aucun contact trouvé.</td></tr>
+            <tr><td colspan="5" class="px-4 py-8 text-center text-on-surface-variant">Aucun contact trouvé.</td></tr>
         {% endfor %}
         </tbody>
     </table>
-
-    {{ knp_pagination_render(pagination) }}
 </div>
+
+<div class="mt-4">{{ knp_pagination_render(pagination) }}</div>
 {% endblock %}

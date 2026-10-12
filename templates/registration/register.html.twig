@@ -1,19 +1,37 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+<main class="min-h-screen flex items-center justify-center p-6 bg-surface">
+    <div class="w-full max-w-[520px] bg-surface-container-lowest rounded-xl shadow-xl shadow-primary/5 p-8 sm:p-10">
+        <div class="flex items-center gap-2.5 mb-6">
+            <div class="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold">F</div>
+            <span class="font-headline-md text-headline-md text-on-surface">Freelance<span class="text-primary">CRM</span></span>
+        </div>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface">Créez votre compte</h1>
+        <p class="text-on-surface-variant mt-1 mb-6">Centralisez vos prospects et ne laissez plus aucune relance dormir.</p>
 
-    {{ form_errors(registrationForm) }}
+        {{ form_start(registrationForm) }}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                {{ form_row(registrationForm.firstName) }}
+                {{ form_row(registrationForm.lastName) }}
+            </div>
+            {{ form_row(registrationForm.email) }}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                {{ form_row(registrationForm.plainPassword.first) }}
+                {{ form_row(registrationForm.plainPassword.second) }}
+            </div>
+            {{ form_errors(registrationForm.plainPassword) }}
+            <button type="submit" class="w-full h-11 mt-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-headline-sm shadow-sm transition-colors">
+                Créer mon compte
+            </button>
+        {{ form_end(registrationForm) }}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
-
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+        <p class="mt-6 text-center text-secondary">
+            Déjà un compte ?
+            <a href="{{ path('app_login') }}" class="text-primary font-semibold hover:underline">Se connecter</a>
+        </p>
+    </div>
+</main>
 {% endblock %}

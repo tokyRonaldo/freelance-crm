@@ -1,38 +1,45 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Connexion{% endblock %}
 
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
-
-        {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+<main class="min-h-screen flex items-center justify-center p-6 bg-surface">
+    <div class="w-full max-w-[460px]">
+        <div class="bg-surface-container-lowest rounded-xl shadow-xl shadow-primary/5 p-8 sm:p-10">
+            <div class="flex flex-col items-center text-center mb-6">
+                <div class="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center font-bold text-xl mb-4">F</div>
+                <h1 class="font-headline-md text-headline-md text-on-surface mb-1">Bon retour parmi nous</h1>
+                <p class="text-secondary">Connectez-vous pour suivre vos opportunités et vos relances.</p>
             </div>
-        {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+            {% if error %}
+                <div class="mb-4 p-3 rounded-lg bg-error-container text-on-error-container text-sm">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
 
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
+            <form method="post" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-on-surface mb-1">Adresse e-mail</label>
+                    <input type="email" id="username" name="_username" value="{{ last_username }}" required autofocus autocomplete="email"
+                           class="w-full h-10 px-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-on-surface mb-1">Mot de passe</label>
+                    <input type="password" id="password" name="_password" required autocomplete="current-password"
+                           class="w-full h-10 px-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <button type="submit" class="w-full h-11 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-headline-sm shadow-sm transition-colors">
+                    Se connecter
+                </button>
+            </form>
 
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
-            </div>
-        #}
-
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
-    </form>
+            <p class="mt-6 text-center text-secondary">
+                Pas encore de compte ?
+                <a href="{{ path('app_register') }}" class="text-primary font-semibold hover:underline">Créer un compte</a>
+            </p>
+        </div>
+    </div>
+</main>
 {% endblock %}

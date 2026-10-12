@@ -50,9 +50,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'owner')]
     private Collection $contacts;
 
+    /**
+     * @var Collection<int, Opportunity>
+     */
+    #[ORM\OneToMany(targetEntity: Opportunity::class, mappedBy: 'owner')]
+    private Collection $opportunities;
+
     public function __construct()
     {
         $this->contacts = new ArrayCollection();
+        $this->opportunities = new ArrayCollection();
+         $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -196,6 +204,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($contact->getOwner() === $this) {
                 $contact->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Opportunity>
+     */
+    public function getOpportunities(): Collection
+    {
+        return $this->opportunities;
+    }
+
+    public function addOpportunity(Opportunity $opportunity): static
+    {
+        if (!$this->opportunities->contains($opportunity)) {
+            $this->opportunities->add($opportunity);
+            $opportunity->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOpportunity(Opportunity $opportunity): static
+    {
+        if ($this->opportunities->removeElement($opportunity)) {
+            // set the owning side to null (unless already changed)
+            if ($opportunity->getOwner() === $this) {
+                $opportunity->setOwner(null);
             }
         }
 

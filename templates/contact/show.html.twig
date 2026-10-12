@@ -1,62 +1,199 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout_app.html.twig' %}
 
-{% block title %}Contact{% endblock %}
+{% block title %}{{ contact.firstName }} {{ contact.lastName }}{% endblock %}
 
-{% block body %}
-    <h1>Contact</h1>
+{% block content %}
+<a href="{{ path('app_contact_index') }}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-3">
+    <span class="material-symbols-outlined text-[16px]">arrow_back</span> Contacts
+</a>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ contact.id }}</td>
-            </tr>
-            <tr>
-                <th>LastName</th>
-                <td>{{ contact.lastName }}</td>
-            </tr>
-            <tr>
-                <th>FirstName</th>
-                <td>{{ contact.firstName }}</td>
-            </tr>
-            <tr>
-                <th>Company</th>
-                <td>{{ contact.company }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ contact.email }}</td>
-            </tr>
-            <tr>
-                <th>Phone</th>
-                <td>{{ contact.phone }}</td>
-            </tr>
-            <tr>
-                <th>Website</th>
-                <td>{{ contact.website }}</td>
-            </tr>
-            <tr>
-                <th>Source</th>
-                <td>{{ contact.source }}</td>
-            </tr>
-            <tr>
-                <th>Type</th>
-                <td>{{ contact.type }}</td>
-            </tr>
-            <tr>
-                <th>Notes</th>
-                <td>{{ contact.notes }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ contact.createdAt ? contact.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+{# ===== En-tête ===== #}
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-6 mb-6">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-xl bg-primary text-on-primary flex items-center justify-center font-display-lg text-2xl shadow-sm">
+                {{ (contact.firstName|default('')|first ~ contact.lastName|first)|upper }}
+            </div>
+            <div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <h1 class="font-headline-lg text-headline-lg text-on-surface">{{ contact.firstName }} {{ contact.lastName }}</h1>
+                    <span class="px-3 py-1 rounded-full font-label-sm text-label-sm {{ contact.type == 'client' ? 'bg-primary-fixed text-on-primary-fixed' : 'bg-secondary-container text-on-secondary-container' }}">
+                        {{ contact.type|capitalize }}
+                    </span>
+                </div>
+                {% if contact.company %}
+                    <p class="mt-1 flex items-center gap-1 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[18px] text-primary">domain</span> {{ contact.company }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
 
-    <a href="{{ path('app_contact_index') }}">back to list</a>
+        <div class="flex flex-wrap items-center gap-2">
+            {% if contact.type == 'prospect' %}
+                <form method="post" action="{{ path('app_contact_convert', {id: contact.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('convert' ~ contact.id) }}">
+                    <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed-variant hover:bg-tertiary-fixed-dim font-label-lg text-label-lg transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">bolt</span> Convertir en client
+                    </button>
+                </form>
+            {% endif %}
+            <a href="{{ path('app_contact_edit', {id: contact.id}) }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-lg text-label-lg transition-colors">
+                <span class="material-symbols-outlined text-[18px]">edit_note</span> Modifier
+            </a>
+            {% if contact.opportunities|length > 0 %}
+                <button disabled title="Traitez d'abord les opportunités de ce contact."
+                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-container text-outline cursor-not-allowed opacity-70 font-label-lg text-label-lg">
+                    <span class="material-symbols-outlined text-[18px]">delete</span> Supprimer
+                </button>
+            {% else %}
+                {{ include('contact/_delete_form.html.twig') }}
+            {% endif %}
+        </div>
+    </div>
 
-    <a href="{{ path('app_contact_edit', {'id': contact.id}) }}">edit</a>
+    {# Coordonnées #}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
+        {% set infos = [
+            {icon: 'mail',     label: 'E-mail',    value: contact.email},
+            {icon: 'call',     label: 'Téléphone', value: contact.phone},
+            {icon: 'hub',      label: 'Source',    value: contact.source},
+            {icon: 'calendar_today', label: 'Ajouté le', value: contact.createdAt|date('d/m/Y')},
+        ] %}
+        {% for info in infos %}
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-low">
+                <div class="w-9 h-9 rounded-lg bg-surface-container-lowest text-primary flex items-center justify-center shadow-sm">
+                    <span class="material-symbols-outlined text-[18px]">{{ info.icon }}</span>
+                </div>
+                <div class="min-w-0">
+                    <span class="block font-label-sm text-label-sm text-secondary uppercase tracking-wider">{{ info.label }}</span>
+                    <span class="block text-on-surface font-medium truncate">{{ info.value ?: '—' }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if contact.website %}
+        <p class="mt-3 text-sm">
+            <span class="text-secondary">Site web :</span>
+            {% if contact.website starts with 'http://' or contact.website starts with 'https://' %}
+                <a href="{{ contact.website }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">{{ contact.website }}</a>
+            {% else %}
+                {{ contact.website }}
+            {% endif %}
+        </p>
+    {% endif %}
+</div>
 
-    {{ include('contact/_delete_form.html.twig') }}
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    {# ===== Colonne gauche : notes + opportunités ===== #}
+    <div class="lg:col-span-4 flex flex-col gap-6">
+
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+            <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-[20px] text-primary">sticky_note_2</span> Notes
+            </h2>
+            {% if contact.notes %}
+                <p class="text-on-surface leading-relaxed">{{ contact.notes|nl2br }}</p>
+            {% else %}
+                <p class="text-on-surface-variant">Aucune note.</p>
+            {% endif %}
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-primary">pie_chart</span> Opportunités
+                </h2>
+                <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
+                    {{ contact.opportunities|length }}
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                {% for opportunity in contact.opportunities %}
+                    <a href="{{ path('app_opportunity_show', {id: opportunity.id}) }}"
+                       class="block p-4 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors">
+                        <div class="flex items-start justify-between gap-2">
+                            <span class="font-headline-sm text-headline-sm text-on-surface">{{ opportunity.title }}</span>
+                            <span class="px-2.5 py-1 rounded-full font-label-sm text-label-sm whitespace-nowrap {{ opportunity.status.badgeClass }}">
+                                {{ opportunity.status.label }}
+                            </span>
+                        </div>
+                        <p class="mt-2 font-headline-sm text-on-surface">{{ opportunity.amount|number_format(2, ',', ' ') }} €</p>
+                    </a>
+                {% else %}
+                    <p class="text-on-surface-variant">Aucune opportunité pour ce contact.</p>
+                {% endfor %}
+            </div>
+
+            <a href="{{ path('app_opportunity_new') }}" class="mt-4 w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-lg text-label-lg transition-colors">
+                <span class="material-symbols-outlined text-[20px]">add_circle</span> Ajouter une opportunité
+            </a>
+        </div>
+    </div>
+
+    {# ===== Colonne droite : historique + formulaire ===== #}
+    <div class="lg:col-span-8 flex flex-col gap-6">
+
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+            <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 mb-5">
+                <span class="material-symbols-outlined text-[22px] text-primary">timeline</span>
+                Historique des échanges
+            </h2>
+
+            {% if activities|length > 0 %}
+                <div class="relative pl-6 space-y-5 before:content-[''] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-surface-container-highest">
+                    {% for activity in activities %}
+                        <div class="relative">
+                            <div class="absolute -left-6 top-0 w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center ring-4 ring-surface-container-lowest">
+                                <span class="material-symbols-outlined text-[13px]">{{ activity.type.icon }}</span>
+                            </div>
+                            <div class="ml-2 p-4 rounded-xl bg-surface-container-low">
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="font-headline-sm text-headline-sm text-on-surface">{{ activity.title }}</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">{{ activity.type.label }}</span>
+                                        {% if activity.opportunity %}
+                                            <span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+                                                {{ activity.opportunity.title }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="font-label-sm text-label-sm text-secondary">{{ activity.occurredAt|date('d/m/Y à H:i') }}</span>
+                                </div>
+                                {% if activity.description %}
+                                    <p class="text-on-surface leading-relaxed">{{ activity.description|nl2br }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-on-surface-variant">Aucun échange enregistré pour le moment.</p>
+            {% endif %}
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6" id="activityFormSection">
+            <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-[22px] text-primary">rate_review</span>
+                Enregistrer un échange
+            </h2>
+            <p class="text-on-surface-variant mb-4">Cela garde une trace de l'échange, sans envoyer de message.</p>
+
+            {{ form_start(activityForm) }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                    {{ form_row(activityForm.type) }}
+                    {{ form_row(activityForm.occurredAt) }}
+                </div>
+                {{ form_row(activityForm.title) }}
+                {{ form_row(activityForm.description) }}
+                {{ form_row(activityForm.opportunity) }}
+                <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">send</span> Enregistrer l'échange
+                </button>
+            {{ form_end(activityForm) }}
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'layout_app.html.twig' %}
+
+{% block title %}Edit Opportunity{% endblock %}
+
+{% block content %}
+    <h1>Edit Opportunity</h1>
+
+    {{ include('opportunity/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_opportunity_index') }}">back to list</a>
+
+    {{ include('opportunity/_delete_form.html.twig') }}
+{% endblock %}
