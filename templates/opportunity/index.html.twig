@@ -3,21 +3,52 @@
 {% block title %}Opportunités{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
+{% set status = app.request.query.get('status') %}
+{% set tabs = [
+    {key: 'New', label: 'Nouveau', dot: 'bg-secondary'},
+    {key: 'Contacted', label: 'Contacté', dot: 'bg-primary'},
+    {key: 'Negotiation', label: 'Négociation', dot: 'bg-primary-fixed-dim'},
+    {key: 'Won', label: 'Gagné', dot: 'bg-primary'},
+    {key: 'Lost', label: 'Perdu', dot: 'bg-error'},
+] %}
+{% set rows = status ? opportunities|filter(o => o.status.name == status) : opportunities %}
+{% set total = rows|map(o => o.amount)|reduce((a, b) => a + b, 0) %}
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
     <div>
-        <h1 class="font-headline-lg text-headline-lg text-on-surface">Opportunités</h1>
-        <p class="text-on-surface-variant">Suivez chaque projet, du premier contact à la signature.</p>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface">Opportunités commerciales</h1>
+        <p class="text-on-surface-variant">Suivez chaque projet, de la prise de contact jusqu'à la signature.</p>
     </div>
     <a href="{{ path('app_opportunity_new') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm transition-colors">
-        <span class="material-symbols-outlined text-[18px]">add</span> Nouvelle opportunité
+        <span class="material-symbols-outlined text-[18px]">add_circle</span> Nouvelle opportunité
     </a>
+</div>
+
+<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <div class="bg-surface-container p-1 rounded-xl inline-flex flex-wrap items-center gap-1">
+        <a href="{{ path('app_opportunity_index') }}"
+           class="px-3 py-1.5 rounded-lg font-label-md text-label-md transition-all {{ not status ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface' }}">
+            Toutes <span class="ml-1 text-secondary">{{ opportunities|length }}</span>
+        </a>
+        {% for tab in tabs %}
+            <a href="{{ path('app_opportunity_index', {status: tab.key}) }}"
+               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-label-md text-label-md transition-all {{ status == tab.key ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface' }}">
+                <span class="w-2 h-2 rounded-full {{ tab.dot }}"></span>
+                {{ tab.label }}
+                <span class="text-secondary">{{ opportunities|filter(o => o.status.name == tab.key)|length }}</span>
+            </a>
+        {% endfor %}
+    </div>
+    <span class="font-label-md text-label-md text-secondary">
+        {{ rows|length }} opportunité(s) · <strong class="text-on-surface">{{ total|number_format(2, ',', ' ') }} €</strong>
+    </span>
 </div>
 
 <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
     <table class="w-full text-left">
         <thead class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wide">
             <tr>
-                <th class="px-4 py-3">Titre</th>
+                <th class="px-4 py-3">Projet</th>
                 <th class="px-4 py-3">Contact</th>
                 <th class="px-4 py-3 text-right">Montant</th>
                 <th class="px-4 py-3">Statut</th>
@@ -26,21 +57,25 @@
             </tr>
         </thead>
         <tbody class="divide-y divide-surface-container">
-        {% for opportunity in opportunities %}
+        {% for opportunity in rows %}
             <tr class="hover:bg-surface-container-low transition-colors">
                 <td class="px-4 py-3 font-medium">
-                    <a href="{{ path('app_opportunity_show', {id: opportunity.id}) }}" class="hover:text-primary">{{ opportunity.title }}</a>
+                    <a href="{{ path('app_opportunity_show', {id: opportunity.id}) }}" class="text-on-surface hover:text-primary">{{ opportunity.title }}</a>
                 </td>
-                <td class="px-4 py-3 text-on-surface-variant">
-                    <a href="{{ path('app_contact_show', {id: opportunity.contact.id}) }}" class="hover:text-primary">
-                        {{ opportunity.contact.firstName }} {{ opportunity.contact.lastName }}
+                <td class="px-4 py-3">
+                    <a href="{{ path('app_contact_show', {id: opportunity.contact.id}) }}" class="flex items-center gap-2 group">
+                        <span class="w-7 h-7 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center text-[11px] font-bold">
+                            {{ (opportunity.contact.firstName|default('')|first ~ opportunity.contact.lastName|first)|upper }}
+                        </span>
+                        <span class="leading-tight">
+                            <span class="block text-on-surface group-hover:text-primary">{{ opportunity.contact.firstName }} {{ opportunity.contact.lastName }}</span>
+                            {% if opportunity.contact.company %}<span class="block text-body-sm text-secondary">{{ opportunity.contact.company }}</span>{% endif %}
+                        </span>
                     </a>
                 </td>
-                <td class="px-4 py-3 text-right font-semibold">{{ opportunity.amount|number_format(2, ',', ' ') }} €</td>
+                <td class="px-4 py-3 text-right font-headline-sm text-headline-sm text-on-surface">{{ opportunity.amount|number_format(2, ',', ' ') }} €</td>
                 <td class="px-4 py-3">
-                    <span class="px-2.5 py-1 rounded-full font-label-sm text-label-sm {{ opportunity.status.badgeClass }}">
-                        {{ opportunity.status.label }}
-                    </span>
+                    <span class="px-2.5 py-1 rounded-full font-label-sm text-label-sm {{ opportunity.status.badgeClass }}">{{ opportunity.status.label }}</span>
                 </td>
                 <td class="px-4 py-3 text-on-surface-variant">{{ opportunity.closedAt ? opportunity.closedAt|date('d/m/Y') : '—' }}</td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
@@ -48,7 +83,9 @@
                 </td>
             </tr>
         {% else %}
-            <tr><td colspan="6" class="px-4 py-8 text-center text-on-surface-variant">Aucune opportunité.</td></tr>
+            <tr><td colspan="6" class="px-4 py-10 text-center text-on-surface-variant">
+                Aucune opportunité{{ status ? ' avec ce statut' : '' }}.
+            </td></tr>
         {% endfor %}
         </tbody>
     </table>

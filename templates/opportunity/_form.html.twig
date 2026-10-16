@@ -1,8 +1,48 @@
-{{ form_start(form) }}
-    <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6 max-w-2xl">
-        {{ form_widget(form) }}
-        <button type="submit" class="mt-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm transition-colors">
+{% form_theme form with ['form_div_layout.html.twig'] only %}
+{% import 'form/_ui.html.twig' as ui %}
+
+{{ form_start(form, {attr: {class: 'flex flex-col gap-6'}}) }}
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-6 md:p-10 flex flex-col gap-6">
+
+    <div class="flex items-center gap-3 pb-2">
+        <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[24px]">{{ icon|default('monetization_on') }}</span>
+        </div>
+        <div>
+            <h1 class="font-headline-md text-headline-md font-bold text-on-surface">{{ title }}</h1>
+            <p class="text-secondary">{{ subtitle|default('') }}</p>
+        </div>
+    </div>
+
+    {{ ui.field(form.title, 'Titre du projet', 'assignment', 'ex : Refonte du site vitrine', null) }}
+
+    {% set quick_link %}
+        <a href="{{ path('app_contact_new') }}" class="font-label-sm text-label-sm text-primary hover:text-primary-container font-semibold inline-flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px]">person_add</span> Nouveau contact
+        </a>
+    {% endset %}
+    {{ ui.select(form.contact, 'Contact associé', 'badge', quick_link) }}
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {{ ui.field(form.amount, 'Montant estimé (€ HT)', 'euro', '2500', null) }}
+        {{ ui.select(form.status, 'Statut', 'tune', null) }}
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+        <label for="{{ form.description.vars.id }}" class="flex items-center justify-between font-label-md text-label-md font-medium text-on-surface">
+            <span>Description du besoin</span>
+            <span class="font-label-sm text-label-sm text-secondary font-normal">Optionnel</span>
+        </label>
+        {{ form_widget(form.description, {attr: {rows: 3, placeholder: 'Ex : audit de l\'API et intégration du module de paiement', class: 'w-full p-3.5 border-0 bg-surface-container-low text-on-surface rounded-lg text-sm placeholder-secondary/60 resize-y min-h-[90px] focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/25 transition-all'}}) }}
+        {% for error in form.description.vars.errors %}<p class="text-sm text-error">{{ error.message }}</p>{% endfor %}
+    </div>
+
+    <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 pt-2">
+        <a href="{{ cancel_url }}" class="w-full sm:w-auto h-11 px-6 flex items-center justify-center rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors">Annuler</a>
+        <button type="submit" class="w-full sm:w-auto h-11 px-8 inline-flex items-center justify-center gap-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm transition-colors">
+            <span class="material-symbols-outlined text-[18px]">save</span>
             {{ button_label|default('Enregistrer') }}
         </button>
     </div>
+</div>
 {{ form_end(form) }}

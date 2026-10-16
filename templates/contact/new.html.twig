@@ -3,9 +3,20 @@
 {% block title %}Nouveau contact{% endblock %}
 
 {% block content %}
-    <a href="{{ path('app_contact_index') }}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary mb-2">
-        <span class="material-symbols-outlined text-[16px]">arrow_back</span> Contacts
-    </a>
-    <h1 class="font-headline-lg text-headline-lg text-on-surface mb-6">Nouveau contact</h1>
-    {{ include('contact/_form.html.twig') }}
+<div class="max-w-4xl mx-auto">
+    <nav class="flex items-center gap-1 text-label-md font-label-md text-secondary mb-4">
+        <a href="{{ path('app_contact_index') }}" class="hover:text-primary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">group</span> Contacts
+        </a>
+        <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+        <span class="text-on-surface font-semibold">Nouveau contact</span>
+    </nav>
+    {{ include('contact/_form.html.twig', {
+        title: 'Ajouter un contact',
+        subtitle: 'Enregistrez un nouveau prospect ou client en quelques secondes.',
+        icon: 'person_add',
+        cancel_url: path('app_contact_index'),
+        button_label: 'Enregistrer le contact'
+    }) }}
+</div>
 {% endblock %}

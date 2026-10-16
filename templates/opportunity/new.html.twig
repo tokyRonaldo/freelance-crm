@@ -3,9 +3,20 @@
 {% block title %}New Opportunity{% endblock %}
 
 {% block content %}
-    <h1>Create new Opportunity</h1>
-
-    {{ include('opportunity/_form.html.twig') }}
-
-    <a href="{{ path('app_opportunity_index') }}">back to list</a>
+<div class="max-w-3xl mx-auto">
+    <nav class="flex items-center gap-1 text-label-md font-label-md text-secondary mb-4">
+        <a href="{{ path('app_opportunity_index') }}" class="hover:text-primary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">monetization_on</span> Opportunités
+        </a>
+        <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+        <span class="text-on-surface font-semibold">Nouvelle opportunité</span>
+    </nav>
+    {{ include('opportunity/_form.html.twig', {
+        title: 'Créer une opportunité',
+        subtitle: 'Estimez la valeur du projet et associez-le à un contact.',
+        icon: 'add_circle',
+        cancel_url: path('app_opportunity_index'),
+        button_label: "Créer l'opportunité"
+    }) }}
+</div>
 {% endblock %}

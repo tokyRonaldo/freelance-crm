@@ -1,13 +1,22 @@
 {% extends 'layout_app.html.twig' %}
 
-{% block title %}Edit Opportunity{% endblock %}
+{% block title %}Modifier l\'opportunité{% endblock %}
 
 {% block content %}
-    <h1>Edit Opportunity</h1>
-
-    {{ include('opportunity/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_opportunity_index') }}">back to list</a>
-
-    {{ include('opportunity/_delete_form.html.twig') }}
+<div class="max-w-3xl mx-auto">
+    <nav class="flex items-center gap-1 text-label-md font-label-md text-secondary mb-4">
+        <a href="{{ path('app_opportunity_index') }}" class="hover:text-primary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">monetization_on</span> Opportunités
+        </a>
+        <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+        <span class="text-on-surface font-semibold">Nouvelle opportunité</span>
+    </nav>
+    {{ include('opportunity/_form.html.twig', {
+        title: 'Modifier l\'opportunité',
+        subtitle: Eopportunity.title,
+        icon: 'edit_note',
+        cancel_url: path('app_opportunity_index'),
+        button_label: "Mettre à jour"
+    }) }}
+</div>
 {% endblock %}

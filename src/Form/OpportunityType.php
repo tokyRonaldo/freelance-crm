@@ -23,11 +23,11 @@ class OpportunityType extends AbstractType
         $user = $options['user'];
 
         $builder
-            ->add('title', TextType::class, ['label' => 'Titre'])
+            ->add('title', TextType::class, ['label' => 'Titre du projet'])
             ->add('contact', EntityType::class, [
-                'label' => 'Contact',
+                'label' => 'Contact associé',
                 'class' => Contact::class,
-                'placeholder' => 'Choisir un contact',
+                'placeholder' => 'Sélectionner un contact',
                 'choice_label' => fn (Contact $c) => trim($c->getFirstName() . ' ' . $c->getLastName())
                     . ($c->getCompany() ? ' — ' . $c->getCompany() : ''),
                 'query_builder' => fn (ContactRepository $repo) => $repo->createQueryBuilder('c')
@@ -35,12 +35,8 @@ class OpportunityType extends AbstractType
                     ->setParameter('owner', $user)
                     ->orderBy('c.lastName', 'ASC'),
             ])
-            ->add('description', TextareaType::class, [
-                'label' => 'Description',
-                'required' => false,
-            ])
             ->add('amount', NumberType::class, [
-                'label' => 'Montant estimé (€)',
+                'label' => 'Montant estimé (€ HT)',
                 'scale' => 2,
                 'input' => 'string',
             ])
@@ -48,6 +44,10 @@ class OpportunityType extends AbstractType
                 'label' => 'Statut',
                 'class' => OpportunityStatus::class,
                 'choice_label' => fn (OpportunityStatus $s) => $s->label(),
+            ])
+            ->add('description', TextareaType::class, [
+                'label' => 'Description du besoin',
+                'required' => false,
             ]);
     }
 

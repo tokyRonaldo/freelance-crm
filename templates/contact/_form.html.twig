@@ -1,8 +1,68 @@
-{{ form_start(form) }}
-    <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6 max-w-2xl">
-        {{ form_widget(form) }}
-        <button type="submit" class="mt-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm transition-colors">
-            {{ button_label|default('Enregistrer') }}
-        </button>
+{% form_theme form with ['form_div_layout.html.twig'] only %}
+
+{% import 'form/_ui.html.twig' as ui %}
+
+{{ form_start(form, {attr: {class: 'flex flex-col gap-6'}}) }}
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-6 md:p-10 flex flex-col gap-6">
+
+    <div class="flex items-center gap-3 pb-2">
+        <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[24px]">{{ icon|default('person_add') }}</span>
+        </div>
+        <div>
+            <h1 class="font-headline-md text-headline-md font-bold text-on-surface">{{ title }}</h1>
+            <p class="text-secondary">{{ subtitle|default('') }}</p>
+        </div>
     </div>
+
+    {# Prospect / Client #}
+    <div class="flex flex-col gap-1">
+        <span class="font-label-md text-label-md font-semibold text-on-surface">Statut du contact</span>
+        <div class="grid grid-cols-2 max-w-sm p-1 bg-surface-container rounded-lg gap-1">
+            {% for choice in form.type %}
+                <label class="flex items-center justify-center gap-2 py-2 px-4 rounded-md cursor-pointer select-none text-secondary hover:text-on-surface transition-all font-label-md text-label-md has-[:checked]:bg-surface-container-lowest has-[:checked]:text-primary has-[:checked]:shadow-sm">
+                    {{ form_widget(choice, {attr: {class: 'sr-only'}}) }}
+                    <span class="material-symbols-outlined text-[18px]">{{ choice.vars.value == 'client' ? 'verified' : 'radar' }}</span>
+                    <span>{{ choice.vars.label }}</span>
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {{ ui.field(form.lastName, 'Nom', null, 'ex : Dupont', null) }}
+        {{ ui.field(form.firstName, 'Prénom', null, 'ex : Jean', 'Optionnel') }}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {{ ui.field(form.company, 'Entreprise', 'domain', 'ex : WebSolutions', 'Optionnel') }}
+        {{ ui.select(form.source, 'Source du contact', 'share', null) }}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {{ ui.field(form.email, 'Adresse e-mail', 'mail', 'ex : contact@entreprise.fr', null) }}
+        {{ ui.field(form.phone, 'Téléphone', 'call', 'ex : 06 12 34 56 78', null) }}
+    </div>
+
+    {{ ui.field(form.website, 'Site web', 'language', 'ex : https://entreprise.fr', 'Optionnel') }}
+
+    <div class="flex flex-col gap-1.5">
+        <label for="{{ form.notes.vars.id }}" class="flex items-center justify-between font-label-md text-label-md font-medium text-on-surface">
+            <span>Notes rapides</span>
+            <span class="font-label-sm text-label-sm text-secondary font-normal">Optionnel</span>
+        </label>
+        {{ form_widget(form.notes, {attr: {rows: 3, placeholder: 'Contexte du premier échange, projet envisagé...', class: 'w-full p-3.5 border-0 bg-surface-container-low text-on-surface rounded-lg text-sm placeholder-secondary/60 resize-y min-h-[90px] focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/25 transition-all'}}) }}
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
+        <p class="text-sm text-secondary"><span class="text-error font-bold">*</span> Champ obligatoire.</p>
+        <div class="flex items-center gap-2 justify-end">
+            <a href="{{ cancel_url }}" class="px-4 py-2.5 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors">Annuler</a>
+            <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold shadow-sm transition-colors">
+                <span class="material-symbols-outlined text-[18px]">save</span>
+                {{ button_label|default('Enregistrer le contact') }}
+            </button>
+        </div>
+    </div>
+</div>
 {{ form_end(form) }}
