@@ -65,10 +65,17 @@ class Contact
     #[ORM\OneToMany(mappedBy: 'contact', targetEntity: Activity::class, cascade: ['remove'])]
     private Collection $activities;
 
+    /**
+     * @var Collection<int, Task>
+     */
+    #[ORM\OneToMany(mappedBy: 'contact', targetEntity: Task::class, cascade: ['remove'])]
+    private Collection $tasks;
+
     public function __construct()
     {
         $this->opportunities = new ArrayCollection();
         $this->activities = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -262,6 +269,36 @@ class Contact
             // set the owning side to null (unless already changed)
             if ($activity->getContact() === $this) {
                 $activity->setContact(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setContact($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            // set the owning side to null (unless already changed)
+            if ($task->getContact() === $this) {
+                $task->setContact(null);
             }
         }
 

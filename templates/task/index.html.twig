@@ -1,0 +1,46 @@
+{% extends 'layout_app.html.twig' %}
+
+{% block title %}Tâches & Relances{% endblock %}
+
+{% block content %}
+{% set sections = [
+    {label: 'En retard', icon: 'warning', tasks: overdue, accent: 'text-error', empty: 'Aucune tâche en retard.'},
+    {label: "Aujourd'hui", icon: 'today', tasks: today, accent: 'text-primary', empty: "Rien de prévu aujourd'hui."},
+    {label: 'À venir', icon: 'upcoming', tasks: upcoming, accent: 'text-primary', empty: 'Aucune tâche à venir.'},
+    {label: 'Terminées', icon: 'task_alt', tasks: done, accent: 'text-secondary', empty: 'Aucune tâche terminée pour le moment.'},
+] %}
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface">Tâches & Relances</h1>
+        <p class="text-on-surface-variant">
+            {% if overdue|length > 0 %}
+                <strong class="text-error">{{ overdue|length }} tâche{{ overdue|length > 1 ? 's' : '' }} en retard</strong> —
+            {% endif %}
+            {{ today|length }} prévue{{ today|length > 1 ? 's' : '' }} aujourd'hui.
+        </p>
+    </div>
+    <a href="{{ path('app_task_new') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm transition-colors">
+        <span class="material-symbols-outlined text-[18px]">add</span> Nouvelle tâche
+    </a>
+</div>
+
+<div class="flex flex-col gap-6">
+    {% for section in sections %}
+        <section class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+            <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-[22px] {{ section.accent }}">{{ section.icon }}</span>
+                {{ section.label }}
+                <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">{{ section.tasks|length }}</span>
+            </h2>
+            <div class="flex flex-col gap-2">
+                {% for task in section.tasks %}
+                    {{ include('task/_row.html.twig', {task: task}) }}
+                {% else %}
+                    <p class="text-on-surface-variant">{{ section.empty }}</p>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+</div>
+{% endblock %}

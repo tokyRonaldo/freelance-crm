@@ -103,6 +103,25 @@
         <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-primary">check_box</span> Tâches à faire
+                </h2>
+                <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">{{ tasks|length }}</span>
+            </div>
+            <div class="flex flex-col gap-2">
+                {% for task in tasks %}
+                    {{ include('task/_row.html.twig', {task: task, show_contact: false}) }}
+                {% else %}
+                    <p class="text-on-surface-variant">Aucune tâche en cours pour ce contact.</p>
+                {% endfor %}
+            </div>
+            <a href="{{ path('app_task_new', {contact: contact.id}) }}" class="mt-4 w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-lg text-label-lg transition-colors">
+                <span class="material-symbols-outlined text-[20px]">add_task</span> Planifier une relance
+            </a>
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
                     <span class="material-symbols-outlined text-[20px] text-primary">pie_chart</span> Opportunités
                 </h2>
                 <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">

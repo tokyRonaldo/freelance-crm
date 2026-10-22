@@ -14,6 +14,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use App\Entity\Activity;
 use App\Form\ActivityType;
 use App\Repository\ActivityRepository;
+use App\Repository\TaskRepository;
 
 #[Route('/contact')]
 final class ContactController extends AbstractController
@@ -65,7 +66,7 @@ final class ContactController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_contact_show', methods: ['GET'])]
-    public function show(Contact $contact, ActivityRepository $activityRepository): Response
+    public function show(Contact $contact, ActivityRepository $activityRepository, TaskRepository $taskRepository): Response
     {
         if ($contact->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
@@ -81,6 +82,7 @@ final class ContactController extends AbstractController
         return $this->render('contact/show.html.twig', [
             'contact' => $contact,
             'activities' => $activityRepository->findBy(['contact' => $contact], ['occurredAt' => 'DESC']),
+            'tasks' => $taskRepository->openForContact($contact),
             'activityForm' => $form,
         ]);
     }

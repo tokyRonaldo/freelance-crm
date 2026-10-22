@@ -1,0 +1,22 @@
+{% extends 'layout_app.html.twig' %}
+
+{% block title %}Modifier la tâche{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <nav class="flex items-center gap-1 text-label-md font-label-md text-secondary mb-4">
+        <a href="{{ path('app_task_index') }}" class="hover:text-primary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">check_box</span> Tâches
+        </a>
+        <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+        <span class="text-on-surface font-semibold">Modifier</span>
+    </nav>
+    {{ include('task/_form.html.twig', {
+        title: 'Modifier la tâche',
+        subtitle: task.title,
+        icon: 'edit_note',
+        cancel_url: path('app_task_index'),
+        button_label: 'Mettre à jour'
+    }) }}
+</div>
+{% endblock %}
