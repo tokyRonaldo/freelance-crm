@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FreelanceCRM — Le CRM des freelances{% endblock %}
+
+{% block body %}
+<header class="fixed top-0 inset-x-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-16 max-w-6xl mx-auto px-6 flex items-center justify-between">
+        <a href="{{ path('app_home') }}" class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold">F</div>
+            <span class="font-headline-sm text-headline-sm text-on-surface">FreelanceCRM</span>
+        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ path('app_login') }}" class="px-4 py-2 rounded-lg text-on-surface hover:bg-surface-container-low font-label-md text-label-md transition-colors">Connexion</a>
+            <a href="{{ path('app_register') }}" class="px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm transition-colors">Créer un compte</a>
+        </div>
+    </div>
+</header>
+
+<main class="pt-16">
+    {# ===== Hero ===== #}
+    <section class="relative overflow-hidden">
+        <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative max-w-4xl mx-auto px-6 pt-20 pb-24 text-center">
+            <h1 class="font-display-lg text-display-lg text-on-surface tracking-tight mb-6">
+                Ne perdez plus jamais un prospect ni un contrat freelance
+            </h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-8">
+                Centralisez vos contacts, suivez vos opportunités commerciales et organisez vos relances, dans un espace qui n'appartient qu'à vous.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href="{{ path('app_register') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 h-12 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-md transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">rocket_launch</span> Créer mon compte
+                </a>
+                <a href="{{ path('app_login') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-6 h-12 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors">
+                    Se connecter
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {# ===== Fonctionnalités ===== #}
+    <section class="bg-surface-container-low/60 py-20">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h2 class="font-headline-lg text-headline-lg text-on-surface mb-3">Tout ce qu'il faut pour suivre votre activité commerciale</h2>
+                <p class="text-on-surface-variant">Pas d'usine à gaz : quatre outils simples, pensés pour les indépendants.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% set features = [
+                    {icon: 'contacts', title: 'Contacts centralisés', text: 'Prospects et clients au même endroit, avec recherche et historique de chaque échange.'},
+                    {icon: 'filter_alt', title: 'Pipeline commercial', text: 'Suivez chaque projet de « Nouveau » jusqu\'à « Gagné » ou « Perdu ».'},
+                    {icon: 'check_box', title: 'Relances sans oubli', text: 'Planifiez vos prochaines actions et repérez tout de suite ce qui est en retard.'},
+                    {icon: 'query_stats', title: 'Tableau de bord', text: 'Vos chiffres clés et vos graphiques, calculés à partir de vos propres données.'},
+                ] %}
+                {% for feature in features %}
+                    <div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary mb-5">
+                            <span class="material-symbols-outlined text-[26px]">{{ feature.icon }}</span>
+                        </div>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">{{ feature.title }}</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">{{ feature.text }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# ===== Appel à l'action ===== #}
+    <section class="max-w-4xl mx-auto px-6 py-20 text-center">
+        <h2 class="font-headline-lg text-headline-lg text-on-surface mb-3">Prêt à reprendre la main sur vos prospects ?</h2>
+        <p class="text-on-surface-variant mb-6">Chaque compte est un espace privé : vous ne voyez que vos données, et personne d'autre non plus.</p>
+        <a href="{{ path('app_register') }}" class="inline-flex items-center justify-center gap-2 px-8 h-12 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-md transition-colors">
+            Créer mon compte <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </a>
+    </section>
+</main>
+
+<footer class="bg-surface-container-low py-8">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-on-surface-variant font-body-sm text-body-sm">
+        <span>© {{ 'now'|date('Y') }} FreelanceCRM</span>
+        <span>Projet réalisé avec Symfony 7.4</span>
+    </div>
+</footer>
+{% endblock %}

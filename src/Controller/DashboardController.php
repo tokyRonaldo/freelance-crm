@@ -13,9 +13,13 @@ final class DashboardController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function home(): Response
     {
-        return $this->redirectToRoute('app_dashboard');
-    }
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_dashboard');
+        }
 
+        return $this->render('home/index.html.twig');
+    }
+    
     #[Route('/dashboard', name: 'app_dashboard', methods: ['GET'])]
     public function index(DashboardStats $stats, TaskRepository $tasks): Response
     {

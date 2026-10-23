@@ -17,9 +17,10 @@
     {{ ui.field(form.title, 'Titre du projet', 'assignment', 'ex : Refonte du site vitrine', null) }}
 
     {% set quick_link %}
-        <a href="{{ path('app_contact_new') }}" class="font-label-sm text-label-sm text-primary hover:text-primary-container font-semibold inline-flex items-center gap-1">
+        <button type="button" data-quick-contact="{{ form.contact.vars.id }}"
+                class="font-label-sm text-label-sm text-primary hover:text-primary-container font-semibold inline-flex items-center gap-1">
             <span class="material-symbols-outlined text-[15px]">person_add</span> Nouveau contact
-        </a>
+        </button>
     {% endset %}
     {{ ui.select(form.contact, 'Contact associé', 'badge', quick_link) }}
 

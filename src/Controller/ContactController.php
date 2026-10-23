@@ -144,4 +144,31 @@ final class ContactController extends AbstractController
 
         return $this->redirectToRoute('app_contact_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/quick/new', name: 'app_contact_quick_new', methods: ['GET', 'POST'])]
+    public function quickNew(Request $request, EntityManagerInterface $em): Response
+    {
+        $contact = new Contact();
+        $contact->setType('prospect');
+
+        $form = $this->createForm(ContactType::class, $contact, [
+            'action' => $this->generateUrl('app_contact_quick_new'),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $contact->setOwner($this->getUser());
+            $contact->setCreatedAt(new \DateTimeImmutable());
+            $em->persist($contact);
+            $em->flush();
+
+            return $this->json([
+                'id' => $contact->getId(),
+                'label' => trim($contact->getFirstName() . ' ' . $contact->getLastName())
+                    . ($contact->getCompany() ? ' — ' . $contact->getCompany() : ''),
+            ], Response::HTTP_CREATED);
+        }
+
+        return $this->render('contact/_quick_form.html.twig', ['form' => $form]);
+    }
 }

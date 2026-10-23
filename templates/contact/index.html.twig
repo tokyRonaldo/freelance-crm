@@ -59,8 +59,17 @@
                     </span>
                 </td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
-                    <a href="{{ path('app_contact_show', {id: contact.id}) }}" class="text-primary hover:underline text-sm mr-3">Voir</a>
-                    <a href="{{ path('app_contact_edit', {id: contact.id}) }}" class="text-on-surface-variant hover:text-primary text-sm">Modifier</a>
+                    <a href="{{ path('app_contact_show', {id: contact.id}) }}"
+                    class="inline-flex items-center p-1.5 rounded-lg text-primary hover:bg-primary-container"
+                    title="Voir">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                    </a>
+
+                    <a href="{{ path('app_contact_edit', {id: contact.id}) }}"
+                    class="inline-flex items-center p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary"
+                    title="Modifier">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                    </a>
                 </td>
             </tr>
         {% else %}

@@ -1,0 +1,58 @@
+{% form_theme form with ['form_div_layout.html.twig'] only %}
+{% import 'form/_ui.html.twig' as ui %}
+
+{{ form_start(form, {attr: {class: 'flex flex-col gap-4 p-6 md:p-8', novalidate: 'novalidate'}}) }}
+    <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-[24px]">person_add</span>
+            </div>
+            <div>
+                <h2 class="font-headline-md text-headline-md font-bold text-on-surface">Nouveau contact</h2>
+                <p class="text-secondary">Il sera sélectionné automatiquement.</p>
+            </div>
+        </div>
+        <button type="button" data-dialog-close aria-label="Fermer"
+                class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+    </div>
+
+    {{ form_errors(form) }}
+
+    <div class="flex flex-col gap-1">
+        <span class="font-label-md text-label-md font-semibold text-on-surface">Statut du contact</span>
+        <div class="grid grid-cols-2 p-1 bg-surface-container rounded-lg gap-1">
+            {% for choice in form.type %}
+                <label class="flex items-center justify-center gap-2 py-2 px-4 rounded-md cursor-pointer select-none text-secondary hover:text-on-surface transition-all font-label-md text-label-md has-[:checked]:bg-surface-container-lowest has-[:checked]:text-primary has-[:checked]:shadow-sm">
+                    {{ form_widget(choice, {attr: {class: 'sr-only'}}) }}
+                    <span class="material-symbols-outlined text-[18px]">{{ choice.vars.value == 'client' ? 'verified' : 'radar' }}</span>
+                    <span>{{ choice.vars.label }}</span>
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {{ ui.field(form.lastName, 'Nom', null, 'ex : Dupont', null) }}
+        {{ ui.field(form.firstName, 'Prénom', null, 'ex : Jean', 'Optionnel') }}
+    </div>
+    {{ ui.field(form.company, 'Entreprise', 'domain', 'ex : WebSolutions', 'Optionnel') }}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {{ ui.field(form.email, 'Adresse e-mail', 'mail', 'ex : contact@entreprise.fr', 'Optionnel') }}
+        {{ ui.field(form.phone, 'Téléphone', 'call', 'ex : 06 12 34 56 78', 'Optionnel') }}
+    </div>
+
+    <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 pt-2">
+        <button type="button" data-dialog-close
+                class="w-full sm:w-auto h-11 px-6 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors">
+            Annuler
+        </button>
+        <button type="submit"
+                class="w-full sm:w-auto h-11 px-8 inline-flex items-center justify-center gap-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold shadow-sm transition-colors disabled:opacity-60">
+            <span class="material-symbols-outlined text-[18px]">save</span> Créer le contact
+        </button>
+    </div>
+
+    {{ form_widget(form._token) }}
+{{ form_end(form, {render_rest: false}) }}

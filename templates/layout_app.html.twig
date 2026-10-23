@@ -12,10 +12,10 @@
 ] %}
 
 <aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-container-lowest border-r border-outline-variant/40 z-50 flex flex-col">
-    <div class="h-16 px-4 flex items-center gap-2 border-b border-outline-variant/30">
+    <a href="{{ path('app_home') }}" class="h-16 px-4 flex items-center gap-2 border-b border-outline-variant/30">
         <div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold">F</div>
         <span class="font-headline-sm text-headline-sm text-on-surface">FreelanceCRM</span>
-    </div>
+    </a>
     <nav class="flex flex-col gap-1 p-2 mt-2">
         {% for item in nav %}
             {% set active = route starts with item.prefix %}
@@ -41,9 +41,10 @@
                     <span class="font-label-sm text-label-sm text-on-surface-variant">{{ app.user.userIdentifier }}</span>
                 </div>
             </a>
-            <a href="{{ path('app_logout') }}" class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high" title="Se déconnecter">
+            <button type="button" data-open-dialog="logout-dialog"
+                    class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high" title="Se déconnecter">
                 <span class="material-symbols-outlined text-[20px]">logout</span>
-            </a>
+            </button>
         {% endif %}
     </header>
 
@@ -60,4 +61,102 @@
         </div>
     </main>
 </div>
+{% if app.user %}
+<dialog id="logout-dialog" class="w-full max-w-sm rounded-xl p-0 shadow-2xl backdrop:bg-black/40 bg-surface-container-lowest text-on-surface">
+    <div class="p-6 text-center">
+        <div class="w-12 h-12 rounded-xl bg-error-container text-on-error-container flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined">logout</span>
+        </div>
+        <h2 class="font-headline-md text-headline-md font-bold text-on-surface">Se déconnecter ?</h2>
+        <p class="text-secondary mt-1">Vous devrez vous reconnecter pour retrouver vos contacts.</p>
+        <div class="flex gap-2 mt-6">
+            <button type="button" data-dialog-close
+                    class="flex-1 h-11 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors">
+                Annuler
+            </button>
+            <a href="{{ path('app_logout') }}"
+               class="flex-1 h-11 flex items-center justify-center rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold transition-colors">
+                Se déconnecter
+            </a>
+        </div>
+    </div>
+</dialog>
+{% endif %}
+
+<dialog id="quick-contact-dialog" data-url="{{ path('app_contact_quick_new') }}"
+        class="w-full max-w-lg rounded-xl p-0 shadow-2xl backdrop:bg-black/40 bg-surface-container-lowest text-on-surface">
+    <div data-dialog-body></div>
+</dialog>
+
+<script>
+// ----- Ouvrir / fermer les modals -----
+document.addEventListener('click', (e) => {
+    const opener = e.target.closest('[data-open-dialog]');
+    if (opener) {
+        e.preventDefault();
+        document.getElementById(opener.dataset.openDialog)?.showModal();
+        return;
+    }
+
+    const closer = e.target.closest('[data-dialog-close]');
+    if (closer) {
+        closer.closest('dialog')?.close();
+        return;
+    }
+
+    if (e.target instanceof HTMLDialogElement) {
+        e.target.close(); // clic sur le fond sombre
+    }
+});
+
+// ----- Création rapide d'un contact -----
+(() => {
+    const dialog = document.getElementById('quick-contact-dialog');
+    if (!dialog) return;
+
+    const body = dialog.querySelector('[data-dialog-body]');
+    let targetSelect = null;
+
+    const loadForm = async () => {
+        body.innerHTML = '<p class="p-8 text-center text-on-surface-variant">Chargement…</p>';
+        const response = await fetch(dialog.dataset.url);
+        body.innerHTML = await response.text();
+        body.querySelector('input[type="text"]')?.focus();
+    };
+
+    document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-quick-contact]');
+        if (!trigger) return;
+
+        e.preventDefault();
+        targetSelect = document.getElementById(trigger.dataset.quickContact);
+        dialog.showModal();
+        loadForm();
+    });
+
+    dialog.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        form.querySelector('[type="submit"]').disabled = true;
+
+        const response = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+
+        if (response.status === 201) {
+            const contact = await response.json();
+
+            if (targetSelect) {
+                targetSelect.add(new Option(contact.label, contact.id, true, true));
+                targetSelect.value = String(contact.id);
+                targetSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            dialog.close();
+            return;
+        }
+
+        body.innerHTML = await response.text(); // le formulaire, avec ses erreurs
+    });
+})();
+</script>
+
 {% endblock %}

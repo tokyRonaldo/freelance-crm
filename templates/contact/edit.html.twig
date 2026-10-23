@@ -13,7 +13,7 @@
     </nav>
     {{ include('contact/_form.html.twig', {
         title: 'Ajouter un contact',
-        subtitle:  contact.firstName ~ ' ' ~ contact.lastNam,
+        subtitle:  contact.firstName ~ ' ' ~ contact.lastName,
         icon: 'edit_note',
         cancel_url: path('app_contact_show', {id: contact.id}),
         button_label: 'Mettre à jour'
