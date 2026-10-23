@@ -1,0 +1,74 @@
+{% extends 'layout_app.html.twig' %}
+
+{% form_theme profileForm with ['form_div_layout.html.twig'] only %}
+{% form_theme passwordForm with ['form_div_layout.html.twig'] only %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block content %}
+{% import 'form/_ui.html.twig' as ui %}
+
+<div class="max-w-3xl mx-auto flex flex-col gap-6">
+
+    <div>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface">Mon profil</h1>
+        <p class="text-on-surface-variant">Membre depuis le {{ app.user.createdAt|date('d/m/Y') }}.</p>
+    </div>
+
+    {# ===== Informations personnelles ===== #}
+    <section class="bg-surface-container-lowest rounded-xl shadow-sm p-6 md:p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-[24px]">manage_accounts</span>
+            </div>
+            <div>
+                <h2 class="font-headline-md text-headline-md font-bold text-on-surface">Informations personnelles</h2>
+                <p class="text-secondary">Votre nom et l'adresse e-mail de connexion.</p>
+            </div>
+        </div>
+
+        {{ form_start(profileForm, {attr: {class: 'flex flex-col gap-4'}}) }}
+            {{ form_errors(profileForm) }}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{ ui.field(profileForm.firstName, 'Prénom', null, 'ex : Jean', null) }}
+                {{ ui.field(profileForm.lastName, 'Nom', null, 'ex : Dupont', null) }}
+            </div>
+            {{ ui.field(profileForm.email, 'Adresse e-mail', 'mail', 'ex : jean@exemple.fr', null) }}
+
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="inline-flex items-center gap-2 px-6 h-11 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">save</span> Enregistrer
+                </button>
+            </div>
+        {{ form_end(profileForm) }}
+    </section>
+
+    {# ===== Mot de passe ===== #}
+    <section class="bg-surface-container-lowest rounded-xl shadow-sm p-6 md:p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-[24px]">lock</span>
+            </div>
+            <div>
+                <h2 class="font-headline-md text-headline-md font-bold text-on-surface">Mot de passe</h2>
+                <p class="text-secondary">8 caractères minimum, avec une majuscule et un chiffre.</p>
+            </div>
+        </div>
+
+        {{ form_start(passwordForm, {attr: {class: 'flex flex-col gap-4'}}) }}
+            {{ ui.field(passwordForm.currentPassword, 'Mot de passe actuel', 'lock', null, null) }}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{ ui.field(passwordForm.newPassword.first, 'Nouveau mot de passe', 'key', null, null) }}
+                {{ ui.field(passwordForm.newPassword.second, 'Confirmer le mot de passe', 'key', null, null) }}
+            </div>
+            {{ form_errors(passwordForm.newPassword) }}
+
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="inline-flex items-center gap-2 px-6 h-11 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">lock_reset</span> Changer le mot de passe
+                </button>
+            </div>
+        {{ form_end(passwordForm) }}
+    </section>
+</div>
+{% endblock %}

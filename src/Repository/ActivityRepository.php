@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Activity;
+use App\Entity\User;
+use App\Enum\ActivityKind;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,28 +19,29 @@ class ActivityRepository extends ServiceEntityRepository
         parent::__construct($registry, Activity::class);
     }
 
-//    /**
-//     * @return Activity[] Returns an array of Activity objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function searchByOwner(User $owner, ?string $search, ?ActivityKind $kind): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->join('a.contact', 'c')->addSelect('c')
+            ->leftJoin('a.opportunity', 'o')->addSelect('o')
+            ->andWhere('a.owner = :owner')
+            ->setParameter('owner', $owner)
+            ->orderBy('a.occurredAt', 'DESC');
 
-//    public function findOneBySomeField($value): ?Activity
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        if ($search !== null && $search !== '') {
+            $qb->andWhere($qb->expr()->orX(
+                'a.title LIKE :search',
+                'a.description LIKE :search',
+                'c.lastName LIKE :search',
+                'c.firstName LIKE :search',
+                'c.company LIKE :search'
+            ))->setParameter('search', '%' . $search . '%');
+        }
+
+        if ($kind !== null) {
+            $qb->andWhere('a.type = :kind')->setParameter('kind', $kind->value);
+        }
+
+        return $qb;
+    }
 }

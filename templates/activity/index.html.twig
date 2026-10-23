@@ -1,0 +1,91 @@
+{% extends 'layout_app.html.twig' %}
+
+{% block title %}Historique d'échanges{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface">Historique d'échanges</h1>
+        <p class="text-on-surface-variant">
+            Tous vos appels, e-mails, réunions et notes — {{ pagination.getTotalItemCount }} échange{{ pagination.getTotalItemCount > 1 ? 's' : '' }}.
+        </p>
+    </div>
+    <a href="{{ path('app_activity_add') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm transition-colors">
+        <span class="material-symbols-outlined text-[18px]">add</span> Enregistrer un échange
+    </a>
+</div>
+
+<form method="get" class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
+    <input type="text" name="q" value="{{ search }}" placeholder="Rechercher dans le titre, le compte-rendu ou le contact"
+           class="md:col-span-6 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+    <select name="type" class="md:col-span-3 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+        <option value="">Tous les types</option>
+        {% for k in kinds %}
+            <option value="{{ k.value }}" {{ kind and kind.value == k.value ? 'selected' : '' }}>{{ k.label }}</option>
+        {% endfor %}
+    </select>
+    <div class="md:col-span-3 flex items-center gap-2">
+        <button class="px-4 py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-lg text-label-lg transition-colors">Filtrer</button>
+        <a href="{{ path('app_activity_index') }}" class="text-sm text-primary hover:underline">Réinitialiser</a>
+    </div>
+</form>
+
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+    <table class="w-full text-left">
+        <thead class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wide">
+            <tr>
+                <th class="px-4 py-3">Date</th>
+                <th class="px-4 py-3">Type</th>
+                <th class="px-4 py-3">Échange</th>
+                <th class="px-4 py-3">Contact</th>
+                <th class="px-4 py-3 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-surface-container">
+        {% for activity in pagination %}
+            <tr class="hover:bg-surface-container-low transition-colors align-top">
+                <td class="px-4 py-3 whitespace-nowrap text-on-surface-variant">{{ activity.occurredAt|date('d/m/Y H:i') }}</td>
+                <td class="px-4 py-3">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[14px]">{{ activity.type.icon }}</span>
+                        {{ activity.type.label }}
+                    </span>
+                </td>
+                <td class="px-4 py-3">
+                    <span class="font-medium text-on-surface">{{ activity.title }}</span>
+                    {% if activity.opportunity %}
+                        <span class="ml-1 px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">{{ activity.opportunity.title }}</span>
+                    {% endif %}
+                    {% if activity.description %}
+                        <p class="text-body-sm text-on-surface-variant mt-0.5">
+                            {{ activity.description|length > 90 ? activity.description|slice(0, 90) ~ '…' : activity.description }}
+                        </p>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3">
+                    <a href="{{ path('app_contact_show', {id: activity.contact.id}) }}" class="text-on-surface hover:text-primary">
+                        {{ activity.contact.firstName }} {{ activity.contact.lastName }}
+                    </a>
+                    {% if activity.contact.company %}
+                        <span class="block text-body-sm text-on-surface-variant">{{ activity.contact.company }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-right whitespace-nowrap">
+                    <form method="post" action="{{ path('app_activity_delete', {id: activity.id}) }}" onsubmit="return confirm('Supprimer cet échange ?');" class="inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete-activity' ~ activity.id) }}">
+                        <input type="hidden" name="_back" value="{{ app.request.requestUri }}">
+                        <button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-error-container hover:text-on-error-container" title="Supprimer">
+                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5" class="px-4 py-10 text-center text-on-surface-variant">Aucun échange trouvé.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-4">{{ knp_pagination_render(pagination) }}</div>
+{% endblock %}

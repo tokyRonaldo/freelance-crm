@@ -3,9 +3,12 @@
 {% block layout %}
 {% set route = app.request.attributes.get('_route') ?? '' %}
 {% set nav = [
+    {prefix: 'app_dashboard', label: 'Tableau de bord', icon: 'query_stats', url: path('app_dashboard')},
     {prefix: 'app_contact',     label: 'Contacts',     icon: 'contacts',   url: path('app_contact_index')},
     {prefix: 'app_opportunity', label: 'Opportunités', icon: 'filter_alt', url: path('app_opportunity_index')},
     {prefix: 'app_task', label: 'Tâches & Relances', icon: 'check_box', url: path('app_task_index')},
+    {prefix: 'app_activity', label: "Historique d'échanges", icon: 'forum', url: path('app_activity_index')},
+    {prefix: 'app_profile', label: 'Mon profil', icon: 'settings', url: path('app_profile')},
 ] %}
 
 <aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-container-lowest border-r border-outline-variant/40 z-50 flex flex-col">
@@ -29,7 +32,7 @@
 <div class="pl-64">
     <header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/40 z-40 flex items-center justify-end gap-4 px-6">
         {% if app.user %}
-            <div class="flex items-center gap-2">
+            <a href="{{ path('app_profile') }}" class="flex items-center gap-2 p-1 rounded-lg hover:bg-surface-container-high transition-colors">
                 <div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-label-md font-semibold">
                     {{ (app.user.firstName|default('?')|first ~ app.user.lastName|default('')|first)|upper }}
                 </div>
@@ -37,7 +40,7 @@
                     <span class="font-label-lg text-label-lg text-on-surface">{{ app.user.firstName }} {{ app.user.lastName }}</span>
                     <span class="font-label-sm text-label-sm text-on-surface-variant">{{ app.user.userIdentifier }}</span>
                 </div>
-            </div>
+            </a>
             <a href="{{ path('app_logout') }}" class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high" title="Se déconnecter">
                 <span class="material-symbols-outlined text-[20px]">logout</span>
             </a>

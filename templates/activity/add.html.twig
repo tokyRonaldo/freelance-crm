@@ -1,0 +1,87 @@
+{% extends 'layout_app.html.twig' %}
+
+{% if form %}
+    {% form_theme form with ['form_div_layout.html.twig'] only %}
+{% endif %}
+
+{% block title %}Enregistrer un échange{% endblock %}
+
+{% block content %}
+{% import 'form/_ui.html.twig' as ui %}
+
+<div class="max-w-3xl mx-auto">
+    <nav class="flex items-center gap-1 text-label-md font-label-md text-secondary mb-4">
+        <a href="{{ path('app_activity_index') }}" class="hover:text-primary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">forum</span> Historique d'échanges
+        </a>
+        <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+        <span class="text-on-surface font-semibold">Nouvel échange</span>
+    </nav>
+
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm p-6 md:p-10 flex flex-col gap-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-[24px]">rate_review</span>
+            </div>
+            <div>
+                <h1 class="font-headline-md text-headline-md font-bold text-on-surface">Enregistrer un échange</h1>
+                <p class="text-secondary">Cela garde une trace de l'échange, sans envoyer de message.</p>
+            </div>
+        </div>
+
+        {# ----- Étape 1 : choisir le contact ----- #}
+        {% if contacts|length == 0 %}
+            <p class="text-on-surface-variant">
+                Vous n'avez pas encore de contact.
+                <a href="{{ path('app_contact_new') }}" class="text-primary font-semibold hover:underline">Créez-en un</a> pour y rattacher un échange.
+            </p>
+        {% else %}
+            <form method="get" class="flex flex-col sm:flex-row sm:items-end gap-3">
+                <div class="flex-1 flex flex-col gap-1.5">
+                    <label for="contact" class="font-label-md text-label-md font-medium text-on-surface">Contact concerné</label>
+                    <select id="contact" name="contact" required
+                            class="w-full h-11 px-3.5 rounded-lg border-0 bg-surface-container-low text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/25">
+                        <option value="">Choisir un contact</option>
+                        {% for c in contacts %}
+                            <option value="{{ c.id }}" {{ contact and contact.id == c.id ? 'selected' : '' }}>
+                                {{ c.firstName }} {{ c.lastName }}{{ c.company ? ' — ' ~ c.company : '' }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="h-11 px-5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors">
+                    {{ contact ? 'Changer' : 'Continuer' }}
+                </button>
+            </form>
+        {% endif %}
+
+        {# ----- Étape 2 : le formulaire ----- #}
+        {% if form %}
+            {{ form_start(form, {attr: {class: 'flex flex-col gap-4 pt-2'}}) }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{ ui.select(form.type, "Type d'échange", 'forum', null) }}
+                    {{ ui.field(form.occurredAt, 'Date et heure', 'event', null, null) }}
+                </div>
+                {{ ui.field(form.title, 'Titre', 'title', 'ex : Appel de qualification', null) }}
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="{{ form.description.vars.id }}" class="flex items-center justify-between font-label-md text-label-md font-medium text-on-surface">
+                        <span>Compte-rendu</span>
+                        <span class="font-label-sm text-label-sm text-secondary font-normal">Optionnel</span>
+                    </label>
+                    {{ form_widget(form.description, {attr: {rows: 3, placeholder: "Ce qui a été dit, décidé, à retenir…", class: 'w-full p-3.5 border-0 bg-surface-container-low text-on-surface rounded-lg text-sm placeholder-secondary/60 resize-y min-h-[90px] focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/25 transition-all'}}) }}
+                </div>
+
+                {{ ui.select(form.opportunity, 'Opportunité liée', 'monetization_on', 'Optionnel') }}
+
+                <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 pt-2">
+                    <a href="{{ path('app_activity_index') }}" class="w-full sm:w-auto h-11 px-6 flex items-center justify-center rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors">Annuler</a>
+                    <button type="submit" class="w-full sm:w-auto h-11 px-8 inline-flex items-center justify-center gap-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">save</span> Enregistrer l'échange
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

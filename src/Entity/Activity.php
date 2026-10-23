@@ -36,6 +36,9 @@ class Activity
     #[ORM\Column(enumType: ActivityKind::class)]
     private ActivityKind $type = ActivityKind::Note;
 
+    #[ORM\ManyToOne]
+    private ?User $owner = null;
+
     public function getType(): ActivityKind
     {
         return $this->type;
@@ -109,6 +112,18 @@ class Activity
     public function setOpportunity(?Opportunity $opportunity): static
     {
         $this->opportunity = $opportunity;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

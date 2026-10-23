@@ -180,6 +180,13 @@
                                         {% endif %}
                                     </div>
                                     <span class="font-label-sm text-label-sm text-secondary">{{ activity.occurredAt|date('d/m/Y à H:i') }}</span>
+                                    <form method="post" action="{{ path('app_activity_delete', {id: activity.id}) }}" onsubmit="return confirm('Supprimer cet échange ?');" class="inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete-activity' ~ activity.id) }}">
+                                        <input type="hidden" name="_back" value="{{ app.request.requestUri }}">
+                                        <button class="ml-2 text-on-surface-variant hover:text-error align-middle" title="Supprimer">
+                                            <span class="material-symbols-outlined text-[16px]">delete</span>
+                                        </button>
+                                    </form>
                                 </div>
                                 {% if activity.description %}
                                     <p class="text-on-surface leading-relaxed">{{ activity.description|nl2br }}</p>
